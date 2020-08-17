@@ -10,6 +10,18 @@ app.use(cors());
 
 const repositories = [];
 
+function repositoryExist(request, response, next ){
+  const { id } = request.params
+  const repositoryIndex = repositories.findIndex(repository => repository.id === id )
+
+  if (repositoryIndex < 0 ) {
+    return response.status(400).json({error: 'Repository id does no exist in our data'})
+  }
+
+  return next()
+
+}
+
 app.get("/repositories", (request, response) => {
   
   return response.status(200).json(repositories)
@@ -30,20 +42,23 @@ app.post("/repositories", (request, response) => {
   return response.status(200).json(repository)
 });
 
-app.put("/repositories/:id", (request, response) => {
+app.put("/repositories/:id", repositoryExist,(request, response) => {
   const { id } = request.params
   const {title, url, techs } = request.body
   const repositoryIndex = repositories.findIndex(repository => repository.id === id )
+  const newRepository = { title, url, techs }
 
-  
+  repositories[repositoryIndex] = newRepository
+
+  return response.status(200)
 
 });
 
-app.delete("/repositories/:id", (request, response) => {
+app.delete("/repositories/:id", repositoryExist,(request, response) => {
   // TODO
 });
 
-app.post("/repositories/:id/like", (request, response) => {
+app.post("/repositories/:id/like", repositoryExist,(request, response) => {
   // TODO
 });
 
